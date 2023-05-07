@@ -19,7 +19,7 @@ def main():
     elif page == 'Score':
         score.render()
     else:
-        graph.render()
+        graph.render_sample()
 
 
 if __name__ == '__main__':
