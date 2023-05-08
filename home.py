@@ -1,5 +1,31 @@
 import streamlit as st
 import pandas as pd
+import networkx as nx
+from pyvis.network import Network
+
+
+def render_graph():
+    # CSV 파일 읽기
+    data = pd.read_csv('assets/people_data.csv')
+
+    # 그래프 생성 및 노드 추가
+    G = nx.Graph()
+
+    for index, row in data.iterrows():
+        G.add_node(row['이름'], cell=row['셀'], group=row['직군'], domain1=row['도메인1'], domain2=row['도메인2'])
+
+        if not pd.isna(row['도메인1']):
+            G.add_edge(row['이름'], row['도메인1'])
+
+        if not pd.isna(row['도메인2']):
+            G.add_edge(row['이름'], row['도메인2'])
+
+    # Pyvis 네트워크로 변환 및 시각화
+    nt = Network(notebook=True)
+    nt.from_nx(G)
+    nt.show('people_graph.html')
+    st.write("People Graph:")
+    st.components.v1.html(nt.html, width=800, height=800, scrolling=False)
 
 
 def render():
@@ -8,23 +34,20 @@ def render():
 
     # 조별 사람들의 데이터 생성
     data = {
-        'Group A': ['Person A1', 'Person A2', 'Person A3', 'Person A4', 'Person A5'],
-        'Group B': ['Person B1', 'Person B2', 'Person B3', 'Person B4', 'Person B5'],
-        'Group C': ['Person C1', 'Person C2', 'Person C3', 'Person C4', 'Person C5'],
-        'Group D': ['Person D1', 'Person D2', 'Person D3', 'Person D4', 'Person D5']
+        'A': ['simon.sung', 'july.jy', 'uno.s', 'loki.l', 'harper.ha'],
+        'B': ['arnold.oh', 'jk.tabris', 'kyle.k', 'jerome.jung', 'benji.k'],
+        'C': ['mason.chi', 'top.lee', 'ayla.y', 'alan.kim', 'scarlet.ryu'],
+        'D': ['stan.lee', 'paul.wbc', 'tyler.sg', 'hank.j', 'aiden.l']
     }
 
-    # DataFrame 생성
-    df = pd.DataFrame(data)
+    num_columns = len(data)
+    cols = st.columns(num_columns)
 
-    # 조별 사람들의 데이터 표시
-    st.write(df)
-    '''
-    columns = st.beta_columns(num_groups)
-    for i, group in enumerate(st.session_state.displayed_members, 1):
-    with columns[i-1]:
-        st.subheader(f"조 {i}")
-        for member in group:
-            st.text(member)
-    '''
+    for i, (group, members) in enumerate(data.items()):
+        with cols[i]:
+            st.subheader(group)
+            for member in members:
+                st.write(member)
+
+    render_graph()
 
