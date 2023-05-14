@@ -2,6 +2,9 @@ import streamlit as st
 import home
 import score
 import graph
+import image
+import prompt
+import sheet_test
 
 
 def main():
@@ -17,7 +20,10 @@ def main():
     if page == 'Home':
         home.render()
     elif page == 'Score':
-        score.render()
+        # score.render()
+        # image.render()
+        # prompt.render()
+        sheet_test.render()
     else:
         graph.render_sample()
 
