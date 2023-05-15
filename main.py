@@ -1,9 +1,10 @@
 import streamlit as st
 import home
 import group
-import score
 import graph
 import image_create
+import image_sample
+import score
 import image
 import sheet_test
 
@@ -17,7 +18,7 @@ def main():
     )
     st.sidebar.title('Navigation')
     # Home, Group, Graph, ImageCreate, ImageModification, Score, QuizGraph
-    page = st.sidebar.radio('Go to', ('Home', 'Group', 'Graph', 'ImageCreate'))
+    page = st.sidebar.radio('Go to', ('Home', 'Group', 'Graph', 'ImageCreate', 'ImageSample'))
 
     if page == 'Home':
         home.render()
@@ -27,6 +28,8 @@ def main():
         graph.render()
     elif page == 'ImageCreate':
         image_create.render()
+    elif page == 'ImageSample':
+        image_sample.render()
     elif page == 'Score':
         # score.render()
         # image.render()
