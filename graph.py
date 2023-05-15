@@ -1,35 +1,105 @@
 import streamlit as st
+import pandas as pd
 import networkx as nx
 from pyvis.network import Network
-import base64
-import os
 
 
-def render_sample():
-    st.title('Graph')
-    st.write('This is the Graph page. You can display graphs or charts here.')
+# CSV 파일 읽기
+df = pd.read_csv('assets/people_data.csv')
+# 그래프 생성 및 노드 추가
+G = nx.Graph()
 
-    G = nx.Graph()
-    G.add_node('A')
-    G.add_node('B')
-    G.add_node('C')
-    G.add_node('D')
+for index, row in df.iterrows():
+    G.add_node(row['이름'], group=row['직군'], cell=row['셀'], domain1=row['도메인1'], domain2=row['도메인2'])
 
-    G.add_edge('A', 'B')
-    G.add_edge('A', 'C')
-    G.add_edge('C', 'D')
-    G.add_edge('D', 'B')
+# 같은 속성을 공유하는 노드 사이의 엣지 추가
+for i, row_i in df.iterrows():
+    for j, row_j in df.iterrows():
+        if i != j:
+            if row_i['직군'] == row_j['직군'] or row_i['셀'] == row_j['셀'] or row_i['도메인1'] == row_j['도메인1'] \
+                    or row_i['도메인2'] == row_j['도메인2']:
+                G.add_edge(row_i['이름'], row_j['이름'])
 
-    net = Network(notebook=True)
-    net.from_nx(G)
-    net.save_graph('example.html')
 
-    # Streamlit 에서 HTML 파일 불러오기
-    with open('example.html', 'r') as f:
-        html_string = f.read()
+def create_filtered_graph(selected_names):
+    nodes_to_keep = set(selected_names)
+    for name in selected_names:
+        nodes_to_keep.update(G.neighbors(name))
+    sub_G = G.subgraph(nodes_to_keep).copy()
+    return sub_G
 
-    # HTML 파일 삭제
-    os.remove('example.html')
 
-    # HTML 컴포넌트 추가
-    st.components.v1.html(html_string, width=900, height=600, scrolling=False)
+def show_filtered_graph(_filtered_graph):
+    # Pyvis 네트워크로 변환 및 시각화
+    nt = Network(notebook=True, height='800px', width='100%', bgcolor='#222222', font_color='white')
+
+    # Configure physics options
+    nt.options = {
+        "physics": {
+            "stabilization": {
+                "enabled": True,
+                "iterations": 1000,
+                "updateInterval": 50,
+                "onlyDynamicEdges": False
+            },
+            "barnesHut": {
+                "gravitationalConstant": -4000,
+                "centralGravity": 0.2,
+                "springLength": 200,
+                "springConstant": 0.01,
+                "damping": 0.9,
+                "avoidOverlap": 1
+            },
+            "minVelocity": 0.5,
+            "maxVelocity": 10,
+        },
+        "nodes": {
+            "font": {"size": 15, "face": "tahoma"}
+        },
+        "edges": {
+            "color": {"color": "#FFFFFF"},
+            "font": {"size": 12, "face": "tahoma"},
+            "arrows": {"to": {"enabled": False}}
+        }
+    }
+    nt.from_nx(_filtered_graph)
+    nt.show('people_graph.html')
+    st.write("People Graph:")
+    st.components.v1.html(nt.html, width=800, height=800, scrolling=False)
+
+
+def render():
+    st.title('2023 개인사업자 캠프 상반기 워크샵!')
+    st.write('Welcome to the home page!')
+
+    # 조별 사람들의 데이터 생성
+    data = {
+        'A': ['simon.sung', 'july.jy', 'uno.s', 'loki.l', 'harper.ha'],
+        'B': ['arnold.oh', 'jk.tabris', 'kyle.k', 'jerome.jung', 'benji.k'],
+        'C': ['mason.chi', 'top.lee', 'ayla.y', 'alan.kim', 'scarlet.ryu'],
+        'D': ['stan.lee', 'paul.wbc', 'tyler.sg', 'hank.j', 'aiden.l']
+    }
+
+    num_columns = len(data)
+    cols = st.columns(num_columns)
+
+    for i, (group, members) in enumerate(data.items()):
+        with cols[i]:
+            st.subheader(group)
+            for member in members:
+                st.write(member)
+
+    st.write("\n")
+    st.write("\n")
+    st.write("\n")
+
+    # Select names from the list
+    st.header("동료 그래프")
+    name_list = df['이름'].tolist()
+    selected_names = st.multiselect('Select names:', name_list)
+
+    if selected_names:
+        filtered_graph = create_filtered_graph(selected_names)
+        show_filtered_graph(filtered_graph)
+    else:
+        show_filtered_graph(G)

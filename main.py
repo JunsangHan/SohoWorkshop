@@ -1,5 +1,6 @@
 import streamlit as st
 import home
+import group
 import score
 import graph
 import image
@@ -15,10 +16,15 @@ def main():
         initial_sidebar_state='auto'
     )
     st.sidebar.title('Navigation')
-    page = st.sidebar.radio('Go to', ('Home', 'Score', 'Graph'))
+    # Home, Group, Graph, ImageCreate, ImageModification, Score, QuizGraph
+    page = st.sidebar.radio('Go to', ('Home', 'Group', 'Graph'))
 
     if page == 'Home':
         home.render()
+    elif page == 'Group':
+        group.render()
+    elif page == 'Graph':
+        graph.render()
     elif page == 'Score':
         # score.render()
         # image.render()
