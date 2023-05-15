@@ -5,8 +5,6 @@ import graph
 import image_create
 import image_sample
 import score
-import image
-import sheet_test
 
 
 def main():
@@ -18,7 +16,7 @@ def main():
     )
     st.sidebar.title('Navigation')
     # Home, Group, Graph, ImageCreate, ImageModification, Score, QuizGraph
-    page = st.sidebar.radio('Go to', ('Home', 'Group', 'Graph', 'ImageCreate', 'ImageSample'))
+    page = st.sidebar.radio('Go to', ('Home', 'Group', 'Graph', 'ImageCreate', 'ImageSample', 'Score'))
 
     if page == 'Home':
         home.render()
@@ -31,12 +29,9 @@ def main():
     elif page == 'ImageSample':
         image_sample.render()
     elif page == 'Score':
-        # score.render()
-        # image.render()
-        # prompt.render()
-        sheet_test.render()
+        score.render()
     else:
-        graph.render_sample()
+        home.render()
 
 
 if __name__ == '__main__':
