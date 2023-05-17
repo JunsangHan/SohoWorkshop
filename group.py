@@ -2,8 +2,7 @@ import streamlit as st
 
 
 def render():
-    st.title('2023 개인사업자 캠프 상반기 워크샵!')
-    st.write('Welcome to the home page!')
+    st.title('조편성 👩🏻‍💻🧑🏼‍💻👨🏻‍💼👩🏼‍🔧')
 
     # 조별 사람들의 데이터 생성
     data = {

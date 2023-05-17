@@ -14,7 +14,7 @@ def load_data(sheets_url):
 
 def main():
     st.set_page_config(
-        page_title='2023 kakaobank SOHO Workshop',
+        page_title='kakaobank Soho Workshop',
         page_icon=None,
         layout='wide',
         initial_sidebar_state='auto'
@@ -23,11 +23,18 @@ def main():
 
     df = load_data(st.secrets["menu_url"])
 
-    # Get the list of pages from the DataFrame
-    pages = df['page'].tolist()
+    # Convert the DataFrame to a dictionary
+    pages_mapping = pd.Series(df.name.values, index=df.page).to_dict()
 
-    # Show a selectbox in the sidebar with the pages
-    page = st.sidebar.selectbox("Choose a page", pages)
+    # Get the list of display names from the dictionary
+    display_pages = list(pages_mapping.values())
+
+    # Show a selectbox in the sidebar with the display pages
+    selected_page = st.sidebar.selectbox("Choose a page", display_pages)
+
+    # Map back from the display name to the page name
+    page = list(pages_mapping.keys())[list(pages_mapping.values()).index(selected_page)]
+
     if page == 'Home':
         home.render()
     elif page == 'Group':
