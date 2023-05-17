@@ -1,10 +1,15 @@
 import streamlit as st
+import pandas as pd
 import home
 import group
 import graph
 import image_create
-import image_sample
 import score
+
+
+def load_data(sheets_url):
+    csv_url = sheets_url.replace("/edit#gid=", "/export?format=csv&gid=")
+    return pd.read_csv(csv_url)
 
 
 def main():
@@ -14,24 +19,25 @@ def main():
         layout='wide',
         initial_sidebar_state='auto'
     )
-    st.sidebar.title('Navigation')
-    # Home, Group, Graph, ImageCreate, ImageModification, Score, QuizGraph
-    page = st.sidebar.radio('Go to', ('Home', 'Group', 'Graph', 'ImageCreate', 'ImageSample', 'Score'))
+    st.sidebar.title('페이지')
 
+    df = load_data(st.secrets["menu_url"])
+
+    # Get the list of pages from the DataFrame
+    pages = df['page'].tolist()
+
+    # Show a selectbox in the sidebar with the pages
+    page = st.sidebar.selectbox("Choose a page", pages)
     if page == 'Home':
         home.render()
     elif page == 'Group':
         group.render()
     elif page == 'Graph':
         graph.render()
-    elif page == 'ImageCreate':
+    elif page == 'Bonus':
         image_create.render()
-    elif page == 'ImageSample':
-        image_sample.render()
     elif page == 'Score':
         score.render()
-    else:
-        home.render()
 
 
 if __name__ == '__main__':
