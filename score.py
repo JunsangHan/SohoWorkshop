@@ -20,9 +20,11 @@ def render_group_score():
 
 def render_person_score():
     df = load_data(st.secrets["person_score_url"])
-    # Print results.
-    for row in df.itertuples():
-        st.write(f"{row.name} has a {row.score}")
+    if df.empty:
+        st.header("아직 게임 시작 전입니다.")
+    else:
+        df = df.sort_values(by='점수', ascending=False).reset_index(drop=True)
+        st.table(df)
 
 
 def render_tabs():
