@@ -5,6 +5,7 @@ import group
 import graph
 import image_create
 import score
+import quiz_result_graph
 
 
 def load_data(sheets_url):
@@ -45,6 +46,8 @@ def main():
         image_create.render()
     elif page == 'Score':
         score.render()
+    elif page == 'QuizResult':
+        quiz_result_graph.render()
 
 
 if __name__ == '__main__':
